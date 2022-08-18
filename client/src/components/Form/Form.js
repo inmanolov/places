@@ -12,15 +12,23 @@ const Form = ({ currentId ,setCurrentId }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const user = JSON.parse(localStorage.getItem('profile'));
+    const [filed, setFiled] = useState(false);
 
     useEffect(() => {
         if(post) setPostData(post);
 
     }, [post])
+
+    useEffect(() => {
+        if(postData.selectedFile !== '') {
+            setFiled(true);
+        }
+    }, [postData.selectedFile])
+
     
     const handleSubmit = (e) => {
         e.preventDefault();
-
+       
         if(currentId === 0) {
             dispatch(createPost({...postData, name: user?.result?.name }));
         } else {
@@ -32,6 +40,12 @@ const Form = ({ currentId ,setCurrentId }) => {
     const clear = () => {
         setCurrentId(null);
         setPostData({ title: '', message: '', tags: '', selectedFile: '' });
+    }
+
+    const Warning = () => {
+        return(
+            <h1>Fill all fields</h1>
+        )
     }
 
     if(!user?.result?.name){
@@ -80,7 +94,9 @@ const Form = ({ currentId ,setCurrentId }) => {
                         onDone={({base64}) => setPostData({ ...postData, selectedFile: base64 })}
                     />
                 </div>
-                <Button className={classes.buttonSubmit} variant="contained" color="primary" type="submit" size="large" fullWidth>Submit</Button>
+                {!filed ? (<Warning />) : (       
+                    <Button className={classes.buttonSubmit} variant="contained" color="primary" type="submit" size="large" fullWidth>Submit</Button>
+                )}
                 <Button variant="contained" color="secondary" size="small" onClick={clear} fullWidth>Clear</Button>
             </form>
         </Paper>
