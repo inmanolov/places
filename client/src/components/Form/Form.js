@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TextField, Button, Typography, Paper } from '@material-ui/core';
 import  FileBase  from 'react-file-base64';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import useStyles from './styles.js';
 import { createPost, updatePost } from '../../actions/posts';
@@ -11,6 +12,7 @@ const Form = ({ currentId ,setCurrentId }) => {
     const post = useSelector((state) => currentId ? state.posts.posts.find((p) => p._id === currentId) : null);
     const classes = useStyles();
     const dispatch = useDispatch();
+    const history = useNavigate();
     const user = JSON.parse(localStorage.getItem('profile'));
     const [filed, setFiled] = useState(false);
 
@@ -20,17 +22,17 @@ const Form = ({ currentId ,setCurrentId }) => {
     }, [post])
 
     useEffect(() => {
-        if(postData.selectedFile !== '') {
+        if(postData.selectedFile !== '' && postData.title !== '' && postData.message !== '' && postData.tags !== '') {
             setFiled(true);
         }
-    }, [postData.selectedFile])
+    }, [{...postData}]);
 
     
     const handleSubmit = (e) => {
         e.preventDefault();
        
         if(currentId === 0) {
-            dispatch(createPost({...postData, name: user?.result?.name }));
+            dispatch(createPost({...postData, name: user?.result?.name }, history));
         } else {
             dispatch(updatePost(currentId, {...postData, name: user?.result?.name }));
         }
@@ -44,7 +46,7 @@ const Form = ({ currentId ,setCurrentId }) => {
 
     const Warning = () => {
         return(
-            <h1>Fill all fields</h1>
+            <h3>Fill all fields in order to submit</h3>
         )
     }
 
@@ -75,6 +77,7 @@ const Form = ({ currentId ,setCurrentId }) => {
                     name="message"
                     variant="outlined"
                     label="Message"
+                    required
                     fullWidth
                     value={postData.message}
                     onChange={(e) => setPostData({ ...postData, message: e.target.value })}
@@ -83,6 +86,7 @@ const Form = ({ currentId ,setCurrentId }) => {
                     name="tags"
                     variant="outlined"
                     label="Tags"
+                    required
                     fullWidth
                     value={postData.tags}
                     onChange={(e) => setPostData({ ...postData, tags: e.target.value.split(',') })}
