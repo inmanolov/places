@@ -1,4 +1,4 @@
 # places
-React front end
+React front end,
 Node js, express backend 
 MERN stack
